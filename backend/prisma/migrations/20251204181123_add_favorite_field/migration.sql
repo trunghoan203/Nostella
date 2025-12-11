@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Photo" ADD COLUMN     "isFavorite" BOOLEAN NOT NULL DEFAULT false;

@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Bảng Người dùng
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  fullName         String?
+  isVip            Boolean   @default(false)
+  isVerified       Boolean   @default(false)
+  verificationCode String?
+  avatar           String?
+  codeExpiresAt    DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  albums Album[]
+  photos Photo[]
+}
+
+// 2. Bảng Album (Bộ sưu tập)
+model Album {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos Photo[]
+}
+
+// 3. Bảng Ảnh (Kỷ niệm)
+model Photo {
+  id          String    @id @default(uuid())
+  url         String
+  key         String
+  caption     String?
+  isFavorite  Boolean   @default(false)
+  takenAt     DateTime? @default(now())
+  description String?
+
+  albumId String?
+  userId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  story      String?
+  hasAiStory Boolean @default(false)
+
+  user  User   @relation(fields: [userId], references: [id])
+  album Album? @relation(fields: [albumId], references: [id])
+
+  @@index([userId])
+}
