@@ -38,13 +38,15 @@ export class EmailService {
 
     try {
       const info = await this.transporter.sendMail({
-        from:
-          process.env.MAIL_FROM ?? '"Nostella Team" <no-reply@nostella.com>',
+        from: process.env.MAIL_FROM,
         to: email,
         subject: 'Welcome to Nostella - Verify your email',
         html,
       });
       return info;
+
+      console.log('Email sent: %s', info.messageId);
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       throw new InternalServerErrorException(

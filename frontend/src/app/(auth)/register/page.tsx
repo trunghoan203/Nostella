@@ -48,6 +48,9 @@ export default function RegisterPage() {
       toast.success("Verification code sent!", {
         description: "Please check your email inbox.",
       })
+
+      router.push(`/verify?email=${encodeURIComponent(data.email)}`)
+
     } catch (error: any) {
       const message = error.response?.data?.message || "Registration failed. Please try again."
       toast.error("Registration failed", {

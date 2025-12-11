@@ -39,7 +39,7 @@ export class AuthService {
     await this.usersService.createUser({
       email: dto.email,
       password: hashedPassword,
-      fullName: dto.name || 'Người dùng mới',
+      fullName: dto.fullName || 'Người dùng mới',
       verificationCode,
       codeExpiresAt,
       isVerified: false,
