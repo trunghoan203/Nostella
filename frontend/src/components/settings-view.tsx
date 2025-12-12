@@ -2,7 +2,7 @@
 
 import { useState, useRef  } from "react"
 import { useRouter } from "next/navigation"
-import { User, Mail, LogOut, Camera, Shield, Bell, Palette, Loader2, Check, X, Globe } from "lucide-react"
+import { User, Mail, LogOut, Camera, Bell, Palette, Loader2, Check, X, Globe } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 import { useLanguageStore } from "@/lib/language-store"
 import { Button } from "@/components/ui/button"
@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
+import Image from "next/image"
 
 export function SettingsView() {
   const router = useRouter()
@@ -54,7 +55,7 @@ export function SettingsView() {
       await updateProfile(editedName.trim())
       toast.success("Profile updated successfully")
       setIsEditingName(false)
-    } catch (error) {
+    } catch {
       toast.error("Failed to update profile")
     }
   }
@@ -136,9 +137,11 @@ export function SettingsView() {
                     {isUploadingAvatar ? (
                       <Loader2 className="w-8 h-8 text-white animate-spin" />
                     ) : user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name} 
+                      <Image
+                        src={user.avatar}
+                        alt={user?.name ?? "User avatar"}
+                        width={800}
+                        height={600}
                         className="w-full h-full object-cover"
                       />
                     ) : (

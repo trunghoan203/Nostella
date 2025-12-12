@@ -249,7 +249,7 @@ export function AIStoryGenerator({ photoId, photoTitle, existingStory, onStoryGe
                 </div>
                 <div>
                   <h4 className="font-medium text-foreground text-sm">AI Generated Story</h4>
-                  <p className="text-xs text-muted-foreground">Based on "{photoTitle}"</p>
+                  <p className="text-xs text-muted-foreground">Based on &quot;{photoTitle}&quot;</p>
                 </div>
               </div>
 

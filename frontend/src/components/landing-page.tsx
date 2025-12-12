@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Shield, Sparkles, Clock, ArrowRight, Camera, Heart, ChevronDown } from "lucide-react"
+import { Shield, Sparkles, Clock, ArrowRight, Camera, Heart } from "lucide-react"
+import Image from "next/image"
 
 const features = [
   {
@@ -268,9 +269,11 @@ export function LandingPage() {
                   <div
                     className={`${photo.height} rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:z-20 relative bg-card`}
                   >
-                    <img
+                    <Image
                       src={photo.src}
                       alt={photo.alt}
+                      width={800}
+                      height={600}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />

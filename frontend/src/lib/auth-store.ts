@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { userApi } from "./api";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name?: string;
@@ -32,14 +32,14 @@ export const useAuthStore = create<AuthState>()(
         set({ access_token, user, isAuthenticated: true });
         try {
           localStorage.setItem("token", access_token);
-        } catch (e) {}
+        } catch {}
       },
       logout: () => {
         set({ access_token: null, user: null, isAuthenticated: false });
         try {
           localStorage.removeItem("token");
           localStorage.removeItem("nostella-auth");
-        } catch (e) {}
+        } catch {}
       },
       updateProfile: async (name: string) => {
         set({ isUpdatingProfile: true });

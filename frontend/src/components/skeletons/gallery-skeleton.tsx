@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function GallerySkeleton() {
-  // Create varied heights for masonry effect
   const skeletonHeights = [
     "h-64",
     "h-80",

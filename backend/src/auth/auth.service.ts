@@ -47,8 +47,8 @@ export class AuthService {
 
     try {
       await this.emailService.sendVerificationCode(dto.email, verificationCode);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch (error) {
+      console.error('Gửi mail thất bại:', error);
       throw new InternalServerErrorException(
         'Failed to send verification email',
       );

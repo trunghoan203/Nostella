@@ -5,6 +5,7 @@ import { MapPin, Calendar, Heart, Sparkles, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { EmptyState } from "@/components/empty-state"
 import { PhotoWithMeta, usePhotosStore } from "@/lib/photos-store"
+import Image from "next/image"
 
 interface GalleryProps {
   photos: PhotoWithMeta[]
@@ -72,10 +73,15 @@ function MemoryCard({ photo, index, onClick }: MemoryCardProps) {
       >
         {/* Image Container */}
         <div className="relative overflow-hidden">
-          <img
+          <Image
             src={photo.imageUrl || "/placeholder.svg"}
             alt={photo.title}
-            className={cn("w-full h-auto object-cover transition-transform duration-500", isHovered && "scale-105")}
+            width={800}
+            height={600}
+            className={cn(
+              "w-full h-auto object-cover transition-transform duration-500",
+              isHovered && "scale-105"
+            )}
           />
 
           {/* Gradient Overlay on Hover */}

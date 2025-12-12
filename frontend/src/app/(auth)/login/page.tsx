@@ -15,6 +15,13 @@ import { AuthLayout } from "@/components/auth/auth-layout"
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth"
 import { authApi } from "@/lib/api"
 import { useAuthStore } from "@/lib/auth-store"
+import type { User } from "@/lib/auth-store"
+
+interface LoginResponse {
+  access_token?: string
+  token?: string
+  user?: User
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -37,33 +44,29 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
     try {
-        const response = (await authApi.login(data.email, data.password)) as {
-        access_token?: string
-        user?: any
-      }
-
-      const access_token = response.access_token ?? (response as any).token
-      const user = response.user
-
+      const response = (await authApi.login(data.email, data.password)) as LoginResponse
+      const access_token = response.access_token ?? response.token
+      const user = response.user as User
       if (!access_token) {
         throw new Error("No access token returned from server")
       }
-
       setAuth(access_token, user)
-
       try {
         localStorage.setItem("token", access_token)
-      } catch (e) {}
-
+      } catch {}
       toast.success("Welcome back!", {
         description: "You have successfully signed in to your account.",
       })
       router.push("/")
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Invalid email or password. Please try again."
-      toast.error("Sign in failed", {
-        description: message,
-      })
+    } catch (err: unknown) {
+      let message = "Invalid email or password. Please try again."
+
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } } }
+        message = axiosErr.response?.data?.message ?? message
+      }
+
+      toast.error("Sign in failed", { description: message })
     } finally {
       setIsLoading(false)
     }
@@ -155,7 +158,7 @@ export default function LoginPage() {
 
         {/* Register Link */}
         <p className="text-center text-muted-foreground">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-secondary hover:text-secondary/80 font-medium transition-colors">
             Create one
           </Link>

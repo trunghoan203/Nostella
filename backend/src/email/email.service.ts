@@ -7,18 +7,26 @@ export class EmailService {
   private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor() {
-    if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
-      throw new Error('MAIL_USER and MAIL_PASS must be set in environment');
-    }
+    const mailHost = process.env.MAIL_HOST || 'smtp.gmail.com';
+    const mailPort = parseInt(process.env.MAIL_PORT || '587');
+    const mailUser = process.env.MAIL_USER;
+    const mailPass = process.env.MAIL_PASS;
+    const isSecure = process.env.MAIL_SECURE === 'true';
+
+    console.log(
+      `[EmailService] Config: Host=${mailHost}, Port=${mailPort}, Secure=${isSecure}, User=${mailUser}`,
+    );
 
     this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: (process.env.MAIL_SECURE ?? 'false') === 'true',
+      host: mailHost,
+      port: mailPort,
+      secure: isSecure,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: mailUser,
+        pass: mailPass,
       },
+      debug: true,
+      logger: true,
     });
   }
 
@@ -44,11 +52,8 @@ export class EmailService {
         html,
       });
       return info;
-
-      console.log('Email sent: %s', info.messageId);
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch (error) {
+      console.error('[EmailService] Error sending email:', error);
       throw new InternalServerErrorException(
         'Failed to send verification email',
       );

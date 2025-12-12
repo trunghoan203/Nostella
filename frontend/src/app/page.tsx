@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { MobileNav } from "@/components/mobile-nav"
 import { MobileHeader } from "@/components/mobile-header"
@@ -37,8 +36,8 @@ export default function HomePage() {
   const { photos, isLoading, fetchPhotos } = usePhotosStore()
 
   useEffect(() => {
-    setIsHydrated(true)
-  }, [])
+  queueMicrotask(() => setIsHydrated(true))
+}, [])
 
   useEffect(() => {
     if (!isHydrated) return

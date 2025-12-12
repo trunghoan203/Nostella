@@ -37,6 +37,7 @@ import { toast } from "sonner"
 import { usePhotosStore, type PhotoWithMeta } from "@/lib/photos-store"
 import { AIStoryGenerator } from "@/components/ai-story-generator"
 import { useAuthStore } from "@/lib/auth-store"
+import Image from "next/image"
 
 interface PhotoModalProps {
   memory: PhotoWithMeta
@@ -192,7 +193,7 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
     setIsEditing(false)
   }
 
-  const handleStoryGenerated = (story: string) => {
+  const handleStoryGenerated = () => {
     toast.success("Story generated successfully!")
   }
 
@@ -209,9 +210,11 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
         <div className="w-full h-full md:max-h-[90vh] bg-card md:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row animate-in zoom-in-95 duration-300">
           {/* Image Section */}
           <div className="flex-1 relative bg-foreground/5 flex items-center justify-center min-h-0 md:min-h-[400px]">
-            <img
+            <Image
               src={currentPhoto.imageUrl || "/placeholder.svg"}
               alt={currentPhoto.title}
+              width={800}
+              height={600}
               className="max-w-full max-h-full object-contain"
             />
 
@@ -390,7 +393,7 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
                     />
                     <blockquote className="relative p-3 md:p-4 border-l-4 border-secondary/60">
                       <p className="font-serif text-sm md:text-base text-foreground/90 leading-relaxed italic">
-                        "{currentPhoto.description}"
+                        &quot;{currentPhoto.description}&quot;
                       </p>
                     </blockquote>
                   </div>

@@ -5,6 +5,7 @@ import { FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { EmptyState } from "@/components/empty-state"
 import type { PhotoWithMeta } from "@/lib/photos-store"
+import Image from "next/image"
 
 interface TimelineViewProps {
   photos: PhotoWithMeta[]
@@ -197,12 +198,16 @@ function TimelineCard({ photo, index, onClick }: TimelineCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         onClick={onClick}
       >
-        <img
-          src={photo.imageUrl || "/placeholder.svg"}
-          alt={photo.title}
-          className={cn("w-full h-full object-cover transition-transform duration-500", isHovered && "scale-105")}
-        />
-
+        <Image
+            src={photo.imageUrl || "/placeholder.svg"}
+            alt={photo.title}
+            fill
+            className={cn(
+              "object-cover transition-transform duration-500",
+              isHovered && "scale-105"
+            )}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
         <div
           className={cn(
             "absolute inset-0 bg-linear-to-t from-foreground/50 via-transparent to-transparent",

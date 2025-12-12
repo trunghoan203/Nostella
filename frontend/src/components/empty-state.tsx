@@ -88,7 +88,7 @@ export function EmptyState({ type, searchQuery, onUploadClick }: EmptyStateProps
       </div>
 
       {/* Inspirational quote */}
-      <blockquote className="font-serif text-sm italic text-muted-foreground/80 max-w-sm">"{config.quote}"</blockquote>
+      <blockquote className="font-serif text-sm italic text-muted-foreground/80 max-w-sm">&quot;{config.quote}&quot;</blockquote>
     </div>
   )
 }

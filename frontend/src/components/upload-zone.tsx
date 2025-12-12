@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { usePhotosStore } from "@/lib/photos-store"
 import { toast } from "sonner"
+import Image from "next/image"
 
 interface FileWithCaption {
   file: File
@@ -75,7 +76,7 @@ export function UploadZone() {
       try {
         await uploadPhoto(item.file, item.caption || item.file.name)
         successCount++
-      } catch (error) {
+      } catch {
         failCount++
       }
     }
@@ -196,11 +197,14 @@ export function UploadZone() {
             {uploadedFiles.map((item, idx) => (
               <div key={idx} className="flex items-center gap-4 p-3 rounded-xl bg-card border border-border">
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <img
-                    src={item.preview || "/placeholder.svg"}
-                    alt={item.file.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={item.preview || "/placeholder.svg"}
+                      alt={item.file.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate mb-1">{item.file.name}</p>

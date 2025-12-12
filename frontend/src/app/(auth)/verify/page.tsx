@@ -1,6 +1,7 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, MailOpen, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
@@ -26,6 +27,25 @@ interface VerifyResponse {
   }
 }
 
+function getErrorMessage(err: unknown): string {
+  if (!err) return "Verification failed"
+  if (typeof err === "string") return err
+  if (err instanceof Error) return err.message
+
+  try {
+    const axiosErr = err as {
+      response?: { data?: { message?: unknown } }
+      message?: unknown
+    }
+    const msg =
+      axiosErr?.response?.data?.message ?? axiosErr?.message
+
+    if (typeof msg === "string" && msg.length > 0) return msg
+  } catch {}
+
+  return "Verification failed"
+}
+
 function VerifyForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -41,41 +61,38 @@ function VerifyForm() {
       toast.error("Invalid verification link")
       router.push("/login")
     }
-  }, [email])
+  }, [email, router])
 
-  const handleVerify = async () => {
-    if (!email || otp.length !== 6) return
-    if (isLoading) return
+  const handleVerify = useCallback(async () => {
+  if (!email || otp.length !== 6) return
+  if (isLoading) return
 
-    setIsLoading(true)
-    try {
-      const response = await authApi.verify(email, otp) as VerifyResponse
+  setIsLoading(true)
+  try {
+    const response = await authApi.verify(email, otp) as VerifyResponse
 
-      setAuth(response.access_token, response.user)
+    setAuth(response.access_token, response.user)
 
-      toast.success("Email verified successfully!", {
-        description: "Welcome to your memory keeper.",
-      })
+    toast.success("Email verified successfully!", {
+      description: "Welcome to your memory keeper.",
+    })
 
-      router.push("/")
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Verification failed"
+    router.push("/")
+  } catch (err) {
+    const message = getErrorMessage(err)
 
-      toast.error(message)
-    } finally {
-      setIsLoading(false)
-    }
+    toast.error(message)
+  } finally {
+    setIsLoading(false)
   }
+}, [email, otp, isLoading, router, setAuth])
 
   useEffect(() => {
     if (otp.length === 6) {
       const timer = setTimeout(() => handleVerify(), 250)
       return () => clearTimeout(timer)
     }
-  }, [otp])
+  }, [otp, handleVerify])
 
   return (
     <div className="space-y-6">

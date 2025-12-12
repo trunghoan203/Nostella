@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
 import { Camera } from "lucide-react"
+import Image from "next/image"
 
 interface AuthLayoutProps {
   children: ReactNode
@@ -18,14 +19,21 @@ export function AuthLayout({ children, title, subtitle, quote, quoteAuthor }: Au
       {/* Left Side - Nostalgic Image with Quote */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src="/nostalgic-vintage-polaroid-photos-scattered-on-woo.jpg" alt="Nostalgic memories" className="w-full h-full object-cover" />
+          <Image
+            src="/nostalgic-vintage-polaroid-photos-scattered-on-woo.jpg"
+            alt="Nostalgic memories"
+            fill
+            priority
+            className="object-cover"
+            sizes="50vw"
+          />
           <div className="absolute inset-0 bg-linear-to-t from-primary/80 via-primary/40 to-transparent" />
         </div>
 
         {/* Quote Overlay */}
         <div className="relative z-10 flex flex-col justify-end p-12 text-primary-foreground">
           <blockquote className="max-w-md">
-            <p className="font-serif text-2xl leading-relaxed italic mb-4 text-balance">"{quote}"</p>
+            <p className="font-serif text-2xl leading-relaxed italic mb-4 text-balance">&quot;{quote}&quot;</p>
             <cite className="text-sm font-medium opacity-80 not-italic">— {quoteAuthor}</cite>
           </blockquote>
         </div>

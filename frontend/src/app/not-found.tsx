@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Link from "next/link"
 import { Camera, Home, Search, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"

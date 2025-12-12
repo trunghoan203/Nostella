@@ -53,7 +53,8 @@ interface PhotosState {
 function transformPhoto(photo: Photo): PhotoWithMeta {
   const createdDate = new Date(photo.createdAt);
   const takenAtDate = photo.takenAt ? new Date(photo.takenAt) : undefined;
-  const displayDate = takenAtDate || createdDate;
+  const displayDate = takenAtDate ?? createdDate;
+
   return {
     ...photo,
     imageUrl: photo.url,
@@ -65,44 +66,47 @@ function transformPhoto(photo: Photo): PhotoWithMeta {
     }),
     year: displayDate.getFullYear().toString(),
     month: (displayDate.getMonth() + 1).toString().padStart(2, "0"),
-    location: photo.location || undefined,
+    location: photo.location ?? undefined,
     isFavorite: photo.isFavorite ?? false,
     hasAiStory: false,
     tags: [],
     story: undefined,
     takenAtDate: takenAtDate,
-    description: photo.description || undefined,
+    description: photo.description ?? undefined,
   };
 }
 
-export const usePhotosStore = create<PhotosState>((set, get) => ({
+export const usePhotosStore = create<PhotosState>((set) => ({
   photos: [],
   isLoading: false,
   error: null,
   uploadProgress: 0,
   isUploading: false,
 
-  fetchPhotos: async () => {
+  fetchPhotos: async (): Promise<void> => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.get<Photo[]>("/photos");
-      const photos = response.data.map(transformPhoto);
+      const photos: PhotoWithMeta[] = response.data.map(transformPhoto);
       set({ photos, isLoading: false });
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to fetch photos";
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Failed to fetch photos";
       set({ error: message, isLoading: false });
     }
   },
 
-  uploadPhoto: async (file: File, caption: string) => {
+  uploadPhoto: async (file: File, caption: string): Promise<void> => {
     set({ isUploading: true, uploadProgress: 0, error: null });
+
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("caption", caption);
 
-      const response = await api.post("/photos/upload", formData, {
+      const response = await api.post<Photo>("/photos/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onUploadProgress: (progressEvent: any) => {
           const total = progressEvent.total || progressEvent.estimated || 0;
           const progress = total
@@ -110,37 +114,39 @@ export const usePhotosStore = create<PhotosState>((set, get) => ({
             : 0;
           set({ uploadProgress: progress });
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
-      const newPhotoData = response.data as Photo;
-      const newPhoto = transformPhoto(newPhotoData);
+      const newPhoto = transformPhoto(response.data);
 
       set((state) => ({
         photos: [newPhoto, ...state.photos],
         isUploading: false,
         uploadProgress: 100,
       }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to upload photo";
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Failed to upload photo";
       set({ error: message, isUploading: false, uploadProgress: 0 });
       throw new Error(message);
     }
   },
 
-  deletePhoto: async (id: string) => {
+  deletePhoto: async (id: string): Promise<void> => {
     try {
       await api.delete(`/photos/${id}`);
-
-      set((state) => ({
-        photos: state.photos.filter((p) => p.id !== id),
-      }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to delete photo";
+      set((state) => ({ photos: state.photos.filter((p) => p.id !== id) }));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Failed to delete photo";
       throw new Error(message);
     }
   },
 
-  updatePhoto: async (id: string, payload: UpdatePhotoPayload) => {
+  updatePhoto: async (
+    id: string,
+    payload: UpdatePhotoPayload
+  ): Promise<void> => {
     try {
       await api.patch(`/photos/${id}`, payload);
 
@@ -150,7 +156,7 @@ export const usePhotosStore = create<PhotosState>((set, get) => ({
 
           const updatedTakenAt = payload.takenAt
             ? new Date(payload.takenAt)
-            : p.takenAtDate || new Date(p.takenAt);
+            : p.takenAtDate ?? new Date(p.takenAt);
 
           return {
             ...p,
@@ -170,13 +176,14 @@ export const usePhotosStore = create<PhotosState>((set, get) => ({
           };
         }),
       }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to update photo";
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Failed to update photo";
       throw new Error(message);
     }
   },
 
-  toggleFavorite: async (id: string) => {
+  toggleFavorite: async (id: string): Promise<void> => {
     try {
       await api.post(`/photos/${id}/favorite`);
       set((state) => ({
@@ -184,14 +191,15 @@ export const usePhotosStore = create<PhotosState>((set, get) => ({
           p.id === id ? { ...p, isFavorite: !p.isFavorite } : p
         ),
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       const message =
-        error.response?.data?.message || "Failed to update favorite";
+        err.response?.data?.message || "Failed to update favorite";
       throw new Error(message);
     }
   },
 
-  generateAiStory: async (photoId: string) => {
+  generateAiStory: async (photoId: string): Promise<string> => {
     try {
       const response = await api.post<{ story: string }>(
         `/ai/generate/${photoId}`
@@ -200,16 +208,15 @@ export const usePhotosStore = create<PhotosState>((set, get) => ({
 
       set((state) => ({
         photos: state.photos.map((p) =>
-          p.id === photoId ? { ...p, story: story, hasAiStory: true } : p
+          p.id === photoId ? { ...p, story, hasAiStory: true } : p
         ),
       }));
 
       return story;
-    } catch (error: any) {
-      console.error("AI Generation failed", error);
-      throw new Error(
-        error.response?.data?.message || "Failed to generate story"
-      );
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Failed to generate story";
+      throw new Error(message);
     }
   },
 }));

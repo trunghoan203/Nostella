@@ -14,11 +14,27 @@ import { Label } from "@/components/ui/label"
 import { AuthLayout } from "@/components/auth/auth-layout"
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth"
 import { authApi } from "@/lib/api"
-import { useAuthStore } from "@/lib/auth-store"
+
+function getErrorMessage(err: unknown): string {
+  // safe extractor for different shapes of error
+  if (!err) return "Registration failed. Please try again."
+  if (typeof err === "string") return err
+  if (err instanceof Error) return err.message
+
+  // Try axios-like structure: error.response.data.message
+  try {
+    const anyErr = err as { response?: { data?: { message?: unknown } }; message?: unknown }
+    const candidate = anyErr?.response?.data?.message ?? anyErr?.message
+    if (typeof candidate === "string" && candidate.length > 0) return candidate
+  } catch {
+    // ignore
+  }
+
+  return "Registration failed. Please try again."
+}
 
 export default function RegisterPage() {
   const router = useRouter()
-  const setAuth = useAuthStore((state) => state.setAuth)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -51,8 +67,8 @@ export default function RegisterPage() {
 
       router.push(`/verify?email=${encodeURIComponent(data.email)}`)
 
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Registration failed. Please try again."
+    } catch (error: unknown) {
+      const message = getErrorMessage(error)
       toast.error("Registration failed", {
         description: message,
       })
@@ -71,7 +87,7 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Name Field */}
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-foreground">
+          <Label htmlFor="fullName" className="text-foreground">
             Full Name
           </Label>
           <div className="relative">

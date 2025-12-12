@@ -23,13 +23,13 @@ api.interceptors.request.use((config) => {
             parsed?.token ??
             parsed?.state?.access_token ??
             parsed?.state?.token;
-        } catch (e) {}
+        } catch {}
       }
     }
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-  } catch (e) {}
+  } catch {}
   return config;
 });
 
