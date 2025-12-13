@@ -1,37 +1,60 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor() {
-    // Khởi tạo Resend với API Key (Lấy từ biến môi trường hoặc hardcode để test tạm)
-    this.resend = new Resend(process.env.RESEND_API_KEY);
+    const mailHost = process.env.MAIL_HOST || 'smtp.gmail.com';
+    const mailPort = Number(process.env.MAIL_PORT || 465);
+    const mailUser = process.env.MAIL_USER;
+    const mailPass = process.env.MAIL_PASS;
+    const mailFrom = process.env.MAIL_FROM;
+    const isSecure = process.env.MAIL_SECURE === 'true';
+
+    if (!mailUser || !mailPass || !mailFrom) {
+      throw new Error('Missing MAIL_USER, MAIL_PASS or MAIL_FROM');
+    }
+
+    console.log('[EmailService] SMTP config:', {
+      mailHost,
+      mailPort,
+      isSecure,
+      mailUser,
+    });
+
+    this.transporter = nodemailer.createTransport({
+      host: mailHost,
+      port: mailPort,
+      secure: isSecure,
+      auth: {
+        user: mailUser,
+        pass: mailPass,
+      },
+    });
   }
 
   async sendVerificationCode(email: string, code: string) {
     try {
-      const data = await this.resend.emails.send({
-        from: 'Nostella <onboarding@resend.dev>', // Dùng email mặc định của Resend để test
-        to: [email], // Email người nhận
+      return await this.transporter.sendMail({
+        from: `"Nostella" <${process.env.MAIL_FROM}>`,
+        to: email,
         subject: 'Welcome to Nostella - Verify your email',
         html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto">
             <h2>Welcome to Nostella</h2>
-            <p>Your verification code is:</p>
-            <h1>${code}</h1>
+            <p>Your verification code:</p>
+            <h1 style="letter-spacing: 6px">${code}</h1>
             <p>This code expires in 15 minutes.</p>
           </div>
         `,
       });
-
-      console.log('[EmailService] Email sent successfully:', data);
-      return data;
     } catch (error) {
-      console.error('[EmailService] Error sending email:', error);
+      console.error('[EmailService] sendMail error:', error);
       throw new InternalServerErrorException(
-        'Could not send verification email',
+        'Failed to send verification email',
       );
     }
   }
