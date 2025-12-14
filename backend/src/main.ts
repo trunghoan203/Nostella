@@ -15,7 +15,7 @@ async function bootstrap(): Promise<void> {
 
   app.enableCors();
 
-  const port = process.env.PORT ?? 3001;
+  const port = Number(process.env.PORT);
 
   await app.listen(port);
   console.log(`Nostella Backend is running on: http://localhost:${port}`);
