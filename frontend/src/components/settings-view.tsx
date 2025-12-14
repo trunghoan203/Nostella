@@ -35,7 +35,7 @@ export function SettingsView() {
   const { language, t, setLanguage } = useLanguageStore()
 
   const [isEditingName, setIsEditingName] = useState(false)
-  const [editedName, setEditedName] = useState(user?.name || "")
+  const [editedName, setEditedName] = useState(user?.fullName || "")
 
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -61,7 +61,7 @@ export function SettingsView() {
   }
 
   const handleCancelEdit = () => {
-    setEditedName(user?.name || "")
+    setEditedName(user?.fullName || "")
     setIsEditingName(false)
   }
 
@@ -139,14 +139,14 @@ export function SettingsView() {
                     ) : user?.avatar ? (
                       <Image
                         src={user.avatar}
-                        alt={user?.name ?? "User avatar"}
+                        alt={user?.fullName ?? "User avatar"}
                         width={800}
                         height={600}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <span className="text-2xl font-serif font-semibold text-secondary-foreground">
-                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                        {user?.fullName?.charAt(0).toUpperCase() || "U"}
                       </span>
                     )}
                   </div>
@@ -171,7 +171,7 @@ export function SettingsView() {
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-foreground text-lg">{user?.name || "User"}</h3>
+                  <h3 className="font-medium text-foreground text-lg">{user?.fullName || "User"}</h3>
                   <p className="text-sm text-muted-foreground">Change profile photo</p>
                 </div>
               </div>
@@ -196,7 +196,7 @@ export function SettingsView() {
                           autoFocus
                         />
                       ) : (
-                        <p className="font-medium text-foreground truncate">{user?.name || "Not set"}</p>
+                        <p className="font-medium text-foreground truncate">{user?.fullName || "Not set"}</p>
                       )}
                     </div>
                   </div>

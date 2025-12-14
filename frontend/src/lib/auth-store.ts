@@ -5,7 +5,7 @@ import { userApi } from "./api";
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  fullName?: string;
   isVip: boolean;
   avatar?: string;
 }
@@ -17,7 +17,7 @@ interface AuthState {
   isUpdatingProfile: boolean;
   setAuth: (access_token: string, user: User) => void;
   logout: () => void;
-  updateProfile: (name: string) => Promise<void>;
+  updateProfile: (fullName: string) => Promise<void>;
   updateAvatar: (file: File) => Promise<void>;
 }
 
@@ -41,13 +41,13 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem("nostella-auth");
         } catch {}
       },
-      updateProfile: async (name: string) => {
+      updateProfile: async (fullName: string) => {
         set({ isUpdatingProfile: true });
         try {
-          await userApi.updateProfile(name);
+          await userApi.updateProfile(fullName);
           const currentUser = get().user;
           if (currentUser) {
-            set({ user: { ...currentUser, name: name } });
+            set({ user: { ...currentUser, fullName: fullName } });
           }
         } finally {
           set({ isUpdatingProfile: false });
