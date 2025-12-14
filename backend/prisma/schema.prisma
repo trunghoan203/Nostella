@@ -9,17 +9,14 @@ datasource db {
 
 // 1. Bảng Người dùng
 model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  password         String
-  fullName         String?
-  isVip            Boolean   @default(false)
-  isVerified       Boolean   @default(false)
-  verificationCode String?
-  avatar           String?
-  codeExpiresAt    DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String?
+  isVip     Boolean  @default(false)
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   albums Album[]
   photos Photo[]

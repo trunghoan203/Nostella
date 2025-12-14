@@ -7,27 +7,34 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import { toast } from "sonner"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AuthLayout } from "@/components/auth/auth-layout"
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth"
 import { authApi } from "@/lib/api"
+import { useAuthStore } from "@/lib/auth-store"
+
+interface AuthResponse {
+  access_token: string
+  user: {
+    id: string
+    email: string
+    fullName: string
+    isVip: boolean
+  }
+}
 
 function getErrorMessage(err: unknown): string {
-  // safe extractor for different shapes of error
   if (!err) return "Registration failed. Please try again."
   if (typeof err === "string") return err
   if (err instanceof Error) return err.message
 
-  // Try axios-like structure: error.response.data.message
   try {
     const anyErr = err as { response?: { data?: { message?: unknown } }; message?: unknown }
     const candidate = anyErr?.response?.data?.message ?? anyErr?.message
     if (typeof candidate === "string" && candidate.length > 0) return candidate
   } catch {
-    // ignore
   }
 
   return "Registration failed. Please try again."
@@ -35,6 +42,7 @@ function getErrorMessage(err: unknown): string {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const setAuth = useAuthStore((state) => state.setAuth)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -56,16 +64,20 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
     try {
-      await authApi.register(
+      const response = (await authApi.register(
         data.fullName,
         data.email,
         data.password
-      )
-      toast.success("Verification code sent!", {
-        description: "Please check your email inbox.",
+      )) as AuthResponse
+      setAuth(response.access_token, response.user)
+      
+      toast.success("Welcome to Nostella!", {
+        description: "Your account has been created successfully.",
       })
-
-      router.push(`/verify?email=${encodeURIComponent(data.email)}`)
+      
+      setTimeout(() => {
+        router.push("/")
+      }, 100)
 
     } catch (error: unknown) {
       const message = getErrorMessage(error)

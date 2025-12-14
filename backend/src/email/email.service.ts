@@ -7,8 +7,8 @@ export class EmailService {
   private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor() {
-    const mailHost = process.env.MAIL_HOST || 'smtp.gmail.com';
-    const mailPort = Number(process.env.MAIL_PORT || 465);
+    const mailHost = process.env.MAIL_HOST;
+    const mailPort = Number(process.env.MAIL_PORT);
     const mailUser = process.env.MAIL_USER;
     const mailPass = process.env.MAIL_PASS;
     const mailFrom = process.env.MAIL_FROM;
