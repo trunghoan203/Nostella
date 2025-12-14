@@ -11,11 +11,6 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
-  @Post('verify')
-  verify(@Body() body: { email: string; code: string }) {
-    return this.authService.verifyOtp(body.email, body.code);
-  }
-
   @HttpCode(HttpStatus.OK)
   @Post('login')
   login(@Body() dto: AuthDto) {
