@@ -34,28 +34,28 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
         className="relative z-10 w-full h-full max-w-2xl mx-auto p-4 flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-full max-w-md bg-card rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="w-full max-w-xl h-auto max-h-[90vh] bg-card rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col">
           {/* Header */}
-            <div className="relative h-64 shrink-0 bg-secondary/10 overflow-hidden">
+          <div className="relative h-64 shrink-0 bg-secondary/10 overflow-hidden">
+            <Image
+              src={card.imageUrl || "/placeholder.svg"}
+              alt="Blur Background"
+              fill
+              className="object-cover blur-xl opacity-60 scale-110"
+            />
+            <div className="absolute inset-0">
               <Image
                 src={card.imageUrl || "/placeholder.svg"}
-                alt="Blur Background"
+                alt={card.title}
                 fill
-                className="object-cover blur-xl opacity-60 scale-110"
+                className="object-contain drop-shadow-xl"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-              <div className="absolute inset-0">
-                <Image
-                  src={card.imageUrl || "/placeholder.svg"}
-                  alt={card.title}
-                  fill
-                  className="object-contain drop-shadow-xl"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-            <div className="absolute top-4 right-4">
+            </div>
+            <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-white transition-colors"
+                className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-white transition-colors shadow-sm"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -63,13 +63,15 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
           </div>
 
           {/* Content */}
-          <div className="p-8 space-y-6">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
             {/* From & Date */}
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
                 From: <span className="font-semibold text-foreground">{senderName}</span>
               </p>
-              <p className="text-xs text-muted-foreground">{format(new Date(card.createdAt), "MMMM d, yyyy")}</p>
+              <p className="text-xs text-muted-foreground">
+                {card.createdAt ? format(new Date(card.createdAt), "MMMM d, yyyy") : ""}
+              </p>
             </div>
 
             {/* Title */}

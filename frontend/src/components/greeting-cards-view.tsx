@@ -71,41 +71,54 @@ export function GreetingCardsView() {
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cards.map((card) => (
-            <button
-              key={card.id}
-              onClick={() => setSelectedCard(card)}
-              className={`group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 ${
-                !card.isRead ? "border-2 border-secondary" : "border border-border"
-              }`}
-            >
-              {/* Unread Indicator */}
-              {!card.isRead && (
-                <div className="absolute top-3 right-3 z-10 w-3 h-3 rounded-full bg-secondary animate-pulse" />
-              )}
+          {cards.map((card) => {
+             const imageSrc = card.imageUrl || "/placeholder.svg";
+             return (
+              <button
+                key={card.id}
+                onClick={() => setSelectedCard(card)}
+                className={`group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 aspect-video ${
+                  !card.isRead ? "border-2 border-secondary" : "border border-border"
+                }`}
+              >
+                {!card.isRead && (
+                  <div className="absolute top-3 right-3 z-10 w-3 h-3 rounded-full bg-secondary animate-pulse" />
+                )}
 
-              {/* Image */}
-              <Image
-                src={card.imageUrl || "/placeholder.svg"}
-                alt={card.title}
-                width={400}
-                height={192}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                <div className="absolute inset-0 bg-secondary/10 overflow-hidden">
+                  <Image
+                    src={imageSrc}
+                    alt="Blur Background"
+                    fill
+                    className="object-cover blur-xl opacity-60 scale-110"
+                  />
+                  
+                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+                    <Image
+                      src={imageSrc}
+                      alt={card.title}
+                      fill
+                      className="object-contain drop-shadow-md"
+                    />
+                  </div>
+                </div>
 
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-foreground/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-foreground/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-card via-card/80 to-transparent">
-                <p className="text-xs text-muted-foreground font-medium">
-                  From: {card.sender?.fullName || card.senderName || "Unknown"}
-                </p>
-                <h3 className="font-serif text-lg font-semibold text-foreground line-clamp-2 mt-1">{card.title}</h3>
-                <p className="text-xs text-muted-foreground mt-2">{format(new Date(card.createdAt), "MMM d, yyyy")}</p>
-              </div>
-            </button>
-          ))}
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-card via-card/90 to-transparent pt-8">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    From: {card.sender?.fullName || card.senderName || "Unknown"}
+                  </p>
+                  <h3 className="font-serif text-lg font-semibold text-foreground line-clamp-1 mt-0.5">{card.title}</h3>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {card.createdAt ? format(new Date(card.createdAt), "MMM d, yyyy") : ""}
+                  </p>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
