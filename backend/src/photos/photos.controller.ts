@@ -86,4 +86,10 @@ export class PhotosController {
   ) {
     return this.photosService.toggleFavorite(req.user.sub, id);
   }
+
+  @Post('upload-public')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPublicFile(@UploadedFile() file: Express.Multer.File) {
+    return this.photosService.uploadOnly(file);
+  }
 }

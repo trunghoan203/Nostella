@@ -7,7 +7,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { Photo } from '@prisma/client';
-import { UploadApiResponse } from 'cloudinary';
 
 export interface BufferedFile {
   fieldname: string;
@@ -38,7 +37,7 @@ export class PhotosService {
       mimetype: file.mimetype,
     });
 
-    const result = uploadResult as UploadApiResponse;
+    const result = uploadResult;
 
     if (!result.secure_url) {
       throw new BadRequestException('Upload failed');
@@ -120,5 +119,13 @@ export class PhotosService {
         isFavorite: !photo.isFavorite,
       },
     });
+  }
+
+  async uploadOnly(file: Express.Multer.File) {
+    const uploadResult = await this.storageService.uploadImage(file);
+
+    return {
+      url: uploadResult.secure_url,
+    };
   }
 }

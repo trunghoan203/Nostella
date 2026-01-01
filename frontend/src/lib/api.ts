@@ -69,3 +69,37 @@ export const userApi = {
     return response.data;
   },
 };
+
+// Greeting Cards API base
+export const greetingCardApi = {
+  checkReceiver: async (email: string) => {
+    const response = await api.get(`/greeting-cards/check-user?email=${email}`);
+    return response.data;
+  },
+
+  create: async (data: {
+    receiverEmail: string;
+    title: string;
+    message: string;
+    imageUrl: string;
+    scheduledAt: Date;
+  }) => {
+    const response = await api.post("/greeting-cards", data);
+    return response.data;
+  },
+
+  getAllReceived: async () => {
+    const response = await api.get("/greeting-cards");
+    return response.data;
+  },
+
+  getUnreadCount: async () => {
+    const response = await api.get("/greeting-cards/unread-count");
+    return response.data;
+  },
+
+  markAsRead: async (cardId: string) => {
+    const response = await api.patch(`/greeting-cards/${cardId}/read`);
+    return response.data;
+  },
+};

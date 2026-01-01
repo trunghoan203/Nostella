@@ -1,9 +1,9 @@
 "use client"
 
-import { Images, Clock, Upload, Heart, Settings } from "lucide-react"
+import { Images, Clock, Upload, Heart, Settings, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings"
+type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings" | "greeting-cards"
 
 interface MobileNavProps {
   currentView: ViewType
@@ -15,6 +15,7 @@ const navItems = [
   { icon: Clock, label: "Timeline", view: "timeline" as const },
   { icon: Upload, label: "Upload", view: "upload" as const, isFab: true },
   { icon: Heart, label: "Favorites", view: "favorites" as const },
+  { icon: Mail, label: "Cards", view: "greeting-cards" as const },
   { icon: Settings, label: "Settings", view: "settings" as const },
 ]
 

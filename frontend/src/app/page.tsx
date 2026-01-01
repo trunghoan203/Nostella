@@ -15,8 +15,9 @@ import { useAuthStore } from "@/lib/auth-store"
 import { usePhotosStore, type PhotoWithMeta } from "@/lib/photos-store"
 import { LandingPage } from "@/components/landing-page"
 import type { SearchFilters } from "@/components/search-filter"
+import { GreetingCardsView } from "@/components/greeting-cards-view"
 
-type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings"
+type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings" | "greeting-cards"
 
 export default function HomePage() {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoWithMeta | null>(null)
@@ -196,6 +197,7 @@ export default function HomePage() {
         {currentView === "upload" && <UploadZone />}
         {currentView === "favorites" && <FavoritesView photos={favoritePhotos} onPhotoClick={setSelectedPhoto} />}
         {currentView === "settings" && <SettingsView />}
+        {currentView === "greeting-cards" && <GreetingCardsView />}
       </main>
 
       {/* Mobile Navigation */}

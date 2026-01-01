@@ -8,6 +8,7 @@ import { StorageModule } from './storage/storage.module';
 import { PhotosModule } from './photos/photos.module';
 import { ConfigModule } from '@nestjs/config';
 import { AiModule } from './ai/ai.module';
+import { GreetingCardsModule } from './greeting-cards/greeting-cards.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AiModule } from './ai/ai.module';
       isGlobal: true,
     }),
     AiModule,
+    GreetingCardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

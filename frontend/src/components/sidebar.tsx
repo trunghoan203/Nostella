@@ -1,11 +1,12 @@
 "use client"
 
-import { Images, Clock, Upload, Heart, Settings, ChevronLeft, Sparkles } from "lucide-react"
+import { Images, Clock, Upload, Heart, Settings, ChevronLeft, Sparkles, Gift } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { SearchFilter, type SearchFilters } from "@/components/search-filter"
+import useSWR from "swr"
 
-type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings"
+type ViewType = "gallery" | "timeline" | "upload" | "favorites" | "settings" | "greeting-cards"
 
 interface SidebarProps {
   collapsed: boolean
@@ -27,6 +28,7 @@ const navItems = [
 
 const secondaryItems = [
   { icon: Heart, label: "Favorites", view: "favorites" as const },
+  { icon: Gift, label: "Greeting Cards", view: "greeting-cards" as const },
   { icon: Settings, label: "Settings", view: "settings" as const },
 ]
 
@@ -41,6 +43,19 @@ export function Sidebar({
   onFiltersChange,
   availableYears,
 }: SidebarProps) {
+  const { data: unreadCountData } = useSWR(
+    "/greeting-cards/unread-count",
+    async (url) => {
+      const token = localStorage.getItem("token")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${url}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!response.ok) throw new Error("Failed to fetch")
+      return response.json()
+    },
+    { refreshInterval: 30000 },
+  )
+
   return (
     <aside
       className={cn(
@@ -98,24 +113,36 @@ export function Sidebar({
       {/* Divider */}
       <div className="mx-4 h-px bg-sidebar-border" />
 
-      {/* Secondary Navigation */}
+      {/* Secondary Navigation - with unread badge for Greeting Cards */}
       <nav className="p-4 space-y-2">
-        {secondaryItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => onViewChange(item.view)}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-              "hover:bg-sidebar-accent",
-              currentView === item.view
-                ? "bg-secondary text-secondary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-sidebar-foreground",
-            )}
-          >
-            <item.icon className="w-5 h-5 shrink-0" />
-            {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
-          </button>
-        ))}
+        {secondaryItems.map((item) => {
+          const isGiftIcon = item.view === "greeting-cards"
+          const unreadCount = isGiftIcon ? unreadCountData?.count || 0 : 0
+
+          return (
+            <button
+              key={item.label}
+              onClick={() => onViewChange(item.view)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                "hover:bg-sidebar-accent",
+                currentView === item.view
+                  ? "bg-secondary text-secondary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-sidebar-foreground",
+              )}
+            >
+              <div className="relative">
+                <item.icon className="w-5 h-5 shrink-0" />
+                {isGiftIcon && unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </div>
+              {!collapsed && <span className="text-sm font-medium flex-1 text-left">{item.label}</span>}
+            </button>
+          )
+        })}
       </nav>
 
       {/* Collapse Toggle */}
